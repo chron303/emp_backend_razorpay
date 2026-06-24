@@ -1,1 +1,80 @@
 1.read folder.scheme.txt and make the schema accordingly
+2.Implement the onboarding module for the reimbursement management system.
+Architecture:
+
+src/
+├── routes/
+├── controllers/
+├── services/
+├── validators/
+├── middlewares/
+├── utils/
+
+Authentication:
+- Cookie-based JWT authentication.
+- Login must set an auth cookie.
+- Protected routes will later read the auth cookie.
+- JWT should contain userId and role.
+
+Role Rules:
+- Every newly registered account starts with EMP role.
+- Users cannot choose their role during registration.
+- Only emails ending with @org.com are allowed.
+
+Endpoints:
+
+POST /rest/onboardings/register
+
+Request Body:
+{
+  "name": "John Doe",
+  "email": "john@org.com",
+  "password": "password123"
+}
+
+Rules:
+- Validate required fields.
+- Validate org.com domain.
+- Email must be unique.
+- Hash password before storing.
+- Assign EMP role automatically.
+- Do NOT log the user in.
+
+POST /rest/onboardings/login
+
+Request Body:
+{
+  "email": "john@org.com",
+  "password": "password123"
+}
+
+Rules:
+- Validate required fields.
+- Validate org.com domain.
+- Verify credentials.
+- Generate JWT.
+- Set auth cookie.
+- Return success response.
+
+POST /rest/onboardings/logout
+
+Rules:
+- Clear auth cookie.
+- Return success response.
+
+Implementation Requirements:
+- Keep controllers thin.
+- Put business logic inside auth.service.js.
+- Put validation inside auth.validator.js.
+- Use existing ROLES enum.
+- Use standardized response helper.
+- Follow SOLID principles.
+
+First provide ONLY:
+1. auth.validator.js responsibilities
+2. auth.service.js responsibilities
+3. onboarding.controller.js responsibilities
+4. onboarding.routes.js responsibilities
+
+Do not generate code yet.
+3.Implemet the Code
