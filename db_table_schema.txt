@@ -1,0 +1,58 @@
+users{
+    purpose:
+    stores all system users
+
+    attributes:
+    id(primary key)
+    name
+    email(unique)
+    password(hashed password)
+    role(EMP,RM,APE,CFO)
+    ceratedAt
+    UpdatedAt
+
+    Rules:
+    every new registration starts with EMP role
+    only emp users have managerID
+    email must be unique
+
+
+}
+
+employee_manager{
+    purpose:
+    stores reporting realtionship between EMP and RM ROLES
+
+    fields:
+    id
+    employeeID(reference user.id)
+    managerID(reference user.id)
+    ceratedAt
+    updatedAt   
+
+    Rules:
+    one EMP reports to at most one RM
+    one RM can manage multiple EMP
+}
+
+reimbursements{
+    purpose:
+    stores all reimbursement 
+
+    fields:
+    id
+    employeeID
+    title
+    description
+    amount
+    status(pending,approved,rejected)
+    rmDescision(pending,approved,rejected)
+    apeDescision(pending,approved,rejected)
+    cretaedAT
+    updatedAt
+
+    rules:
+    only emp can create reimbursement
+    new reimbursement should have fields like em descison apedecison and status pending 
+
+}
