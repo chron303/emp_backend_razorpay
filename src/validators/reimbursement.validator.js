@@ -24,6 +24,11 @@ export const createReimbursementSchema = z.object({
 // ─── Decision (approve / reject) ──────────────────────────────────────────────
 
 export const decisionSchema = z.object({
+    reimbursementId: z
+        .number({ required_error: "reimbursementId is required", invalid_type_error: "reimbursementId must be a number" })
+        .int("reimbursementId must be an integer")
+        .positive("reimbursementId must be a positive integer"),
+
     decision: z.enum(
         [REIMBURSEMENT_STATUS.APPROVED, REIMBURSEMENT_STATUS.REJECTED],
         {

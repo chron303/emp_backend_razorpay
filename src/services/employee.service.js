@@ -150,3 +150,33 @@ export async function assignManager({ employeeId, managerId }) {
 
     return created;
 }
+
+// ─── Remove Manager (CFO only) ────────────────────────────────────────────────
+
+/**
+ * Remove the manager assignment for an EMP.
+ * CFO-only operation — enforced at route level.
+ *
+ * @param {{ employeeId: number }} dto
+ * @returns {Promise<object>} the deleted mapping record
+ */
+export async function removeManager({ employeeId }) {
+    // 1. Confirm mapping exists
+    const [existing] = await db
+        .select()
+        .from(employeeManager)
+        .where(eq(employeeManager.employeeId, employeeId))
+        .limit(1);
+
+    if (!existing) {
+        throw notFound(`No manager assignment found for employee ${employeeId}.`);
+    }
+
+    // 2. Delete the mapping
+    const [deleted] = await db
+        .delete(employeeManager)
+        .where(eq(employeeManager.employeeId, employeeId))
+        .returning();
+
+    return deleted;
+}

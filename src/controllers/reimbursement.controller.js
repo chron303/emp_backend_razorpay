@@ -2,7 +2,7 @@ import { validateCreateReimbursement, validateDecision } from "../validators/rei
 import {
     createReimbursement,
     listReimbursements,
-    getReimbursement,
+    getReimbursementsByUser,
     rmDecision,
     apeDecision,
     cfoDecision,
@@ -47,58 +47,53 @@ export async function getReimbursementsHandler(req, res, next) {
     }
 }
 
-// ─── GET /rest/reimbursements/:id ────────────────────────────────────────────
+// ─── GET /rest/reimbursements/:userId ────────────────────────────────────────
 
 /**
- * GET /rest/reimbursements/:id
- * All roles — returns single record with role-based access control.
+ * GET /rest/reimbursements/:userId
+ * All roles — returns all reimbursements for the target user with role-based access control.
  */
-export async function getReimbursementHandler(req, res, next) {
+export async function getReimbursementsByUserHandler(req, res, next) {
     try {
-        const id = parseInt(req.params.id, 10);
+        const targetUserId = parseInt(req.params.userId, 10);
 
-        if (isNaN(id) || id <= 0) {
-            return sendError(res, 400, "Invalid reimbursement id.");
+        if (isNaN(targetUserId) || targetUserId <= 0) {
+            return sendError(res, 400, "Invalid userId param — must be a positive integer.");
         }
 
-        const record = await getReimbursement(id, req.user);
+        const records = await getReimbursementsByUser(targetUserId, req.user);
 
-        return sendSuccess(res, 200, "Reimbursement fetched successfully.", record);
+        return sendSuccess(res, 200, "Reimbursements fetched successfully.", records);
     } catch (err) {
         next(err);
     }
 }
 
-// ─── PATCH /rest/reimbursements/:id/decision ─────────────────────────────────
+// ─── PATCH /rest/reimbursements ───────────────────────────────────────────────
 
 /**
- * PATCH /rest/reimbursements/:id/decision
- * RM, APE, CFO — role determines which decision function is called.
+ * PATCH /rest/reimbursements
+ * RM, APE, CFO — approve or reject a reimbursement.
+ * reimbursementId is passed in the request body.
  */
 export async function decisionHandler(req, res, next) {
     try {
-        const id = parseInt(req.params.id, 10);
-
-        if (isNaN(id) || id <= 0) {
-            return sendError(res, 400, "Invalid reimbursement id.");
-        }
-
         const result = validateDecision(req.body);
 
         if (!result.success) {
             return sendError(res, 422, "Validation failed.", result.error.flatten().fieldErrors);
         }
 
-        const { decision } = result.data;
-        const caller       = req.user;
+        const { reimbursementId, decision } = result.data;
+        const caller = req.user;
         let updated;
 
         if (caller.role === ROLES.RM) {
-            updated = await rmDecision(id, decision, caller);
+            updated = await rmDecision(reimbursementId, decision, caller);
         } else if (caller.role === ROLES.APE) {
-            updated = await apeDecision(id, decision);
+            updated = await apeDecision(reimbursementId, decision);
         } else if (caller.role === ROLES.CFO) {
-            updated = await cfoDecision(id, decision);
+            updated = await cfoDecision(reimbursementId, decision);
         } else {
             return sendError(res, 403, "Forbidden: your role cannot make decisions on reimbursements.");
         }

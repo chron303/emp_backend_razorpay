@@ -1,5 +1,5 @@
-import { validateAssignManager }   from "../validators/employee.validator.js";
-import { listEmployees, assignManager } from "../services/employee.service.js";
+import { validateAssignManager, validateRemoveManager } from "../validators/employee.validator.js";
+import { listEmployees, assignManager, removeManager } from "../services/employee.service.js";
 import { sendSuccess, sendError }   from "../utils/response.js";
 
 // ─── GET /rest/employees ──────────────────────────────────────────────────────
@@ -18,10 +18,10 @@ export async function getEmployees(req, res, next) {
     }
 }
 
-// ─── POST /rest/employees/assign-manager ─────────────────────────────────────
+// ─── POST /rest/employees/assign ─────────────────────────────────────────────
 
 /**
- * POST /rest/employees/assign-manager
+ * POST /rest/employees/assign
  * CFO only — assign an EMP to an RM.
  */
 export async function assignManagerHandler(req, res, next) {
@@ -35,6 +35,28 @@ export async function assignManagerHandler(req, res, next) {
         const mapping = await assignManager(result.data);
 
         return sendSuccess(res, 200, "Manager assigned successfully.", mapping);
+    } catch (err) {
+        next(err);
+    }
+}
+
+// ─── DELETE /rest/employees/assign ───────────────────────────────────────────
+
+/**
+ * DELETE /rest/employees/assign
+ * CFO only — remove an EMP's manager assignment.
+ */
+export async function removeManagerHandler(req, res, next) {
+    try {
+        const result = validateRemoveManager(req.body);
+
+        if (!result.success) {
+            return sendError(res, 422, "Validation failed.", result.error.flatten().fieldErrors);
+        }
+
+        const deleted = await removeManager(result.data);
+
+        return sendSuccess(res, 200, "Manager assignment removed successfully.", deleted);
     } catch (err) {
         next(err);
     }

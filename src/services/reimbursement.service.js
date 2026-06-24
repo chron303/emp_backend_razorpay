@@ -104,51 +104,72 @@ export async function listReimbursements(caller) {
     return db.select().from(reimbursements);
 }
 
-// ─── Get Single Reimbursement ─────────────────────────────────────────────────
+// ─── Get Reimbursements by User ───────────────────────────────────────────────
 
 /**
- * Fetch a single reimbursement by id, with caller-based access control.
+ * Fetch all reimbursements belonging to a specific user (targetUserId),
+ * with caller-based access control.
  *
- * @param {number} id
+ *  EMP   → can only view their own (targetUserId must equal caller.userId)
+ *  RM    → can only view reimbursements of their direct subordinates
+ *  APE   → can view any user's RM-approved reimbursements
+ *  CFO   → can view any user's reimbursements
+ *
+ * @param {number} targetUserId
  * @param {{ userId: number, role: string }} caller
- * @returns {Promise<object>}
+ * @returns {Promise<object[]>}
  */
-export async function getReimbursement(id, caller) {
-    const [record] = await db
-        .select()
-        .from(reimbursements)
-        .where(eq(reimbursements.id, id))
-        .limit(1);
-
-    if (!record) throw notFound(`Reimbursement ${id} not found.`);
-
-    // EMP can only view their own
-    if (caller.role === ROLES.EMP && record.employeeId !== caller.userId) {
-        throw forbidden("You do not have access to this reimbursement.");
+export async function getReimbursementsByUser(targetUserId, caller) {
+    // EMP: can only view their own
+    if (caller.role === ROLES.EMP) {
+        if (targetUserId !== caller.userId) {
+            throw forbidden("You can only view your own reimbursements.");
+        }
+        return db
+            .select()
+            .from(reimbursements)
+            .where(eq(reimbursements.employeeId, targetUserId));
     }
 
-    // RM can only view subordinates'
+    // RM: can only view subordinates
     if (caller.role === ROLES.RM) {
         const [mapping] = await db
             .select()
             .from(employeeManager)
             .where(
                 and(
-                    eq(employeeManager.employeeId, record.employeeId),
+                    eq(employeeManager.employeeId, targetUserId),
                     eq(employeeManager.managerId, caller.userId)
                 )
             )
             .limit(1);
 
-        if (!mapping) throw forbidden("You do not manage the owner of this reimbursement.");
+        if (!mapping) throw forbidden("You do not manage this employee.");
+
+        return db
+            .select()
+            .from(reimbursements)
+            .where(eq(reimbursements.employeeId, targetUserId));
     }
 
-    // APE can only view RM-approved
-    if (caller.role === ROLES.APE && record.rmDecision !== REIMBURSEMENT_STATUS.APPROVED) {
-        throw forbidden("This reimbursement has not yet been approved by the RM.");
+    // APE: only RM-approved reimbursements for that user
+    if (caller.role === ROLES.APE) {
+        return db
+            .select()
+            .from(reimbursements)
+            .where(
+                and(
+                    eq(reimbursements.employeeId, targetUserId),
+                    eq(reimbursements.rmDecision, REIMBURSEMENT_STATUS.APPROVED)
+                )
+            );
     }
 
-    return record;
+    // CFO: all reimbursements for that user
+    return db
+        .select()
+        .from(reimbursements)
+        .where(eq(reimbursements.employeeId, targetUserId));
 }
 
 // ─── RM Decision ──────────────────────────────────────────────────────────────

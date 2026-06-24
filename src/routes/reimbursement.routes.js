@@ -6,7 +6,7 @@ import { ROLES }       from "../enums/roles.enum.js";
 import {
     createReimbursementHandler,
     getReimbursementsHandler,
-    getReimbursementHandler,
+    getReimbursementsByUserHandler,
     decisionHandler,
 } from "../controllers/reimbursement.controller.js";
 
@@ -20,6 +20,14 @@ router.post(
     createReimbursementHandler
 );
 
+// PATCH /rest/reimbursements  — RM, APE, CFO (reimbursementId in body)
+router.patch(
+    "/",
+    authenticate,
+    authorise(ROLES.RM, ROLES.APE, ROLES.CFO),
+    decisionHandler
+);
+
 // GET /rest/reimbursements  — all authenticated roles
 router.get(
     "/",
@@ -28,20 +36,12 @@ router.get(
     getReimbursementsHandler
 );
 
-// GET /rest/reimbursements/:id  — all authenticated roles
+// GET /rest/reimbursements/:userId  — all authenticated roles
 router.get(
-    "/:id",
+    "/:userId",
     authenticate,
     authorise(ROLES.EMP, ROLES.RM, ROLES.APE, ROLES.CFO),
-    getReimbursementHandler
-);
-
-// PATCH /rest/reimbursements/:id/decision  — RM, APE, CFO
-router.patch(
-    "/:id/decision",
-    authenticate,
-    authorise(ROLES.RM, ROLES.APE, ROLES.CFO),
-    decisionHandler
+    getReimbursementsByUserHandler
 );
 
 export default router;

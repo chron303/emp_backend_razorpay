@@ -7,8 +7,8 @@ import { assignRoleHandler } from "../controllers/role.controller.js";
 
 const router = Router();
 
-// PATCH /rest/roles/assign  — CFO only
-router.patch(
+// POST /rest/roles/assign  — CFO only
+router.post(
     "/assign",
     authenticate,
     authorise(ROLES.CFO),
