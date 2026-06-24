@@ -77,4 +77,63 @@ First provide ONLY:
 4. onboarding.routes.js responsibilities
 
 Do not generate code yet.
-3.Implemet the Code
+3.Implement the Code
+4.generate drizzle/schema.js 
+build 3 tabls with following schema designed in db_table_schema.txt
+use postgreSQL drizzle schema definations 
+use pgTable 
+export all tables use proper foreign keys 
+use timestamps at createdAT and udpatedAT
+5.Generate drizzle/relations.js for the finalized schema.
+Requirements:
+Tables:
+users
+employee_manager
+reimbursements
+Define all Drizzle relations.
+
+Relationships:
+
+One employee_manager record belongs to one employee user.
+One employee_manager record belongs to one manager user.
+One employee can create many reimbursements.
+One reimbursement belongs to one employee.
+
+Return only drizzle/relations.js code.
+6.generate migrate.js 
+use DATABASE_URL from .env
+execute migrations from drizzle/migration
+log the messages
+ return the code
+
+
+7.generate seed.js 
+database has 3 tables 
+users 
+employee_manager
+reimbursements 
+
+seed only the cfo account 
+
+cfo details 
+email:cfo@org.com
+password:CFO#ORG@April2026
+
+
+rules:
+import users table from schema.js 
+import roles from src/enums/roles.enums.js
+use bcrypt hashing 
+check if cfo already exists by email 
+do not create duplicate 
+if exists log a messaeg and exit succesfully 
+if dont then create cfo account 
+log success message after creation
+handle the errors
+
+
+dont seed EMP,RM,APE users 
+dont seed reimbursements
+dont seed employee-manager mappings 
+
+8. complete and generate drizzle.config.json run npm run db:generate
