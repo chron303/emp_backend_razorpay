@@ -3,7 +3,10 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
-import onboardingRoutes from "./routes/onboarding.routes.js";
+import onboardingRoutes    from "./routes/onboarding.routes.js";
+import roleRoutes          from "./routes/role.routes.js";
+import employeeRoutes      from "./routes/employee.routes.js";
+import reimbursementRoutes from "./routes/reimbursement.routes.js";
 
 const app = express();
 
@@ -19,7 +22,10 @@ app.use(cookieParser());
 
 // ─── Routes ──────ac─────────────────────────────────────────────────────────────
 
-app.use("/rest/onboardings", onboardingRoutes);
+app.use("/rest/onboardings",     onboardingRoutes);
+app.use("/rest/roles",           roleRoutes);
+app.use("/rest/employees",       employeeRoutes);
+app.use("/rest/reimbursements",  reimbursementRoutes);
 
 // ─── Global Error Handler ─────────────────────────────────────────────────────
 
