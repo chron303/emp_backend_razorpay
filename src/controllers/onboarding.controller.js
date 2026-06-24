@@ -4,7 +4,7 @@ import { sendSuccess, sendError } from "../utils/response.js";
 
 // ─── Cookie config ────────────────────────────────────────────────────────────
 
-const COOKIE_NAME = "auth_token";
+const COOKIE_NAME = "auth";
 
 const cookieOptions = {
     httpOnly: true,                          // not accessible from JS
