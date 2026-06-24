@@ -1,0 +1,61 @@
+emp_backend/
+│
+├── package.json
+├── prompt-logs.txt
+├── .env
+├── README.md
+│
+├── drizzle/
+│   ├── schema.js
+│   ├── relations.js
+│   ├── seed.js
+│   ├── migrate.js
+│   └── migrations/
+│
+├── src/
+│
+│   ├── app.js
+│   ├── server.js
+│
+│   ├── routes/
+│   │   ├── onboarding.routes.js
+│   │   ├── role.routes.js
+│   │   ├── employee.routes.js
+│   │   └── reimbursement.routes.js
+│
+│   ├── controllers/
+│   │   ├── onboarding.controller.js
+│   │   ├── role.controller.js
+│   │   ├── employee.controller.js
+│   │   └── reimbursement.controller.js
+│
+│   ├── services/
+│   │   ├── auth.service.js
+│   │   ├── role.service.js
+│   │   ├── employee.service.js
+│   │   └── reimbursement.service.js
+│
+│   ├── middlewares/
+│   │   ├── auth.middleware.js
+│   │   ├── role.middleware.js
+│   │   ├── validation.middleware.js
+│   │   └── error.middleware.js
+│
+│   ├── validators/
+│   │   ├── auth.validator.js
+│   │   ├── role.validator.js
+│   │   ├── employee.validator.js
+│   │   └── reimbursement.validator.js
+│
+│   ├── utils/
+│   │   ├── db.js
+│   │   ├── jwt.js
+│   │   ├── hash.js
+│   │   ├── constants.js
+│   │   └── response.js
+│
+│   └── enums/
+│       ├── roles.enum.js
+│       └── reimbursementStatus.enum.js
+│
+└── tests/

@@ -1,0 +1,1 @@
+1.read folder.scheme.txt and make the schema accordingly
